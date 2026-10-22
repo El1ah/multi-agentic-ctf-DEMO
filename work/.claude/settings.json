@@ -1,0 +1,29 @@
+{
+  "env": {
+    "BASH_DEFAULT_TIMEOUT_MS": "1080000",
+    "BASH_MAX_TIMEOUT_MS": "1800000"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(nmap *)", "Bash(ffuf *)", "Bash(gobuster *)",
+      "Bash(whatweb *)", "Bash(curl *)", "Bash(cat *)", "Bash(ls *)",
+      "Bash(scripts/second-opinion.sh *)", "Bash(./scripts/second-opinion.sh *)",
+      "Bash(/work/scripts/second-opinion.sh *)"
+    ],
+    "deny": [
+      "Bash(iptables *)", "Bash(ip6tables *)", "Bash(openvpn *)",
+      "Bash(shutdown *)", "Bash(reboot *)",
+      "Read(//opt/vpn/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [
+        { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/scope-guard.sh" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Bash", "hooks": [
+        { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/log-command.sh" } ] }
+    ]
+  }
+}

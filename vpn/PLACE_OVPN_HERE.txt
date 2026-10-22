@@ -1,0 +1,3 @@
+Поклади сюди свій конфіг лаби як lab.ovpn, тоді:
+  sudo chown root:root lab.ovpn && sudo chmod 600 lab.ovpn
+Для режиму без VPN (docker-compose.novpn.yml) цей файл не потрібен.

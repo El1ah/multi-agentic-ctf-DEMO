@@ -1,0 +1,15 @@
+# --- СЕКРЕТИ: ніколи в git ---
+vpn/*.ovpn
+!vpn/PLACE_OVPN_HERE.txt
+
+# --- Рантайм: логи й обмін із радником ---
+work/logs/*
+!work/logs/.gitkeep
+work/advice/logs/*
+!work/advice/logs/.gitkeep
+work/advice/question.txt
+work/advice/answer.md
+
+# --- Різне ---
+*.tar.gz
+.DS_Store

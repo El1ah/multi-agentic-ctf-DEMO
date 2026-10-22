@@ -1,0 +1,56 @@
+# Самодостатній демо-стек БЕЗ VPN.
+# Ціль — локальний контейнер juice-shop на labnet зі статичним IP.
+# Запуск:  docker compose -f docker-compose.novpn.yml up -d
+# Бойовий сетап із VPN лишається в docker-compose.yml і не чіпається.
+services:
+  target:
+    image: bkimminich/juice-shop:latest
+    container_name: ctf-target
+    networks:
+      labnet:
+        ipv4_address: 172.30.0.10
+    # ціль нікуди не ходить назовні, лише приймає з labnet
+    # (juice-shop слухає :3000)
+
+  lab:
+    image: ctf-agents-lab
+    build: .
+    container_name: ctf-lab
+    cap_add: [NET_ADMIN]
+    security_opt: ["no-new-privileges:true"]
+    depends_on: [target]
+    environment:
+      TARGET_IP: 172.30.0.10
+      NO_VPN: "1"
+    volumes:
+      - ./work:/work
+      - ./work/.claude:/work/.claude:ro
+      - ./work/AGENTS.md:/work/AGENTS.md:ro
+      - ./work/CLAUDE.md:/work/CLAUDE.md:ro
+      - ./work/scripts:/work/scripts:ro
+      - agent-home:/home/agent
+    working_dir: /work
+    networks: [labnet]
+
+  advisor:
+    image: ctf-agents-advisor
+    build: ./advisor
+    container_name: ctf-advisor
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    volumes:
+      - ./work/state:/advisor/state:ro
+      - ./work/advice:/advisor/advice
+      - advisor-home:/home/agent
+    networks: [advnet]
+
+networks:
+  labnet:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+  advnet:
+
+volumes:
+  agent-home:
+  advisor-home:

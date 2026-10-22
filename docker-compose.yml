@@ -1,0 +1,39 @@
+services:
+  lab:
+    build: .
+    container_name: ctf-lab
+    cap_add: [NET_ADMIN]
+    devices: ["/dev/net/tun:/dev/net/tun"]
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      TARGET_IP: ${TARGET_IP:?set TARGET_IP}
+    volumes:
+      - ./vpn:/opt/vpn:ro
+      - ./work:/work
+      # запобіжники агентам лише для читання: інакше будь-який Bash (навіть дозволений curl -o) їх перепише
+      - ./work/.claude:/work/.claude:ro
+      - ./work/AGENTS.md:/work/AGENTS.md:ro
+      - ./work/CLAUDE.md:/work/CLAUDE.md:ro
+      - ./work/scripts:/work/scripts:ro
+      - agent-home:/home/agent      # логін Claude
+    working_dir: /work
+    networks: [labnet]
+
+  advisor:
+    build: ./advisor
+    container_name: ctf-advisor
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    volumes:
+      - ./work/state:/advisor/state:ro
+      - ./work/advice:/advisor/advice
+      - advisor-home:/home/agent    # логін Antigravity
+    networks: [advnet]              # окрема мережа: до контейнера lab і його слухачів шляху немає
+
+networks:
+  labnet:
+  advnet:
+
+volumes:
+  agent-home:
+  advisor-home:
